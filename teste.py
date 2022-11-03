@@ -1,4 +1,6 @@
-teste = ('1', '2')
+import pandas as pd
 
-if '2' in teste:
-    print('OK')
+te = pd.DataFrame()
+
+te2 = pd.DataFrame(data=['casa', 'carro', 'moto'])
+print(pd.concat([te, te2]))
