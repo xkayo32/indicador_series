@@ -66,8 +66,10 @@ class Programa(Validacao):
                         self.st.write(
                             f'p-valor: ', preparacao.teste_shapiro[1])
 
-                    if preparacao.teste_shapiro[1] < 0.05:
-                        st.write('')
+                    if preparacao.teste_shapiro[1] > 0.05:
+                        self.st.success('É uma distribuição normal')
+                    else:
+                        self.st.error('Não é uma distribuição normal')
                 else:
                     self.st.header('Teste de Kolmogorov-Smirnov')
                     col20, col21 = self.st.columns(2)
