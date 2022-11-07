@@ -3,8 +3,10 @@
 
 # Importing the datetime module, the pandas module and the yfinance module.
 from datetime import datetime, timedelta
+from typing import Union
 
 import pandas as pd
+import requests_cache
 import yfinance as yf
 
 
@@ -23,6 +25,8 @@ class AtivoController(object):
         :param intervalo: The interval of time between each data point. valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
         :type intervalo: str 
         """
+        self.session = requests_cache.CachedSession('yfinance.cache')
+        self.session.headers['User-agent'] = 'my-prgram/1.0'
         self.data_inicial = data_inicial
         self.data_final = data_final
         self.ativo = ativo
@@ -58,7 +62,7 @@ class AtivoController(object):
             self.__data_inicial = datetime.strptime(
                 valor, '%Y-%m-%d').strftime('%Y-%m-%d')
         else:
-            self.__data_inicial = valor
+            self.__data_inicial = valor.strftime('%Y-%m-%d')
 
     @property
     def data_final(self) -> str:
@@ -79,42 +83,38 @@ class AtivoController(object):
         :type valor: str | datetime
         """
         if isinstance(valor, str):
-            self.__data_final = datetime.strptime(
-                valor, '%Y-%m-%d').strftime('%Y-%m-%d')
+            self.__data_final = (datetime.strptime(
+                valor, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
         else:
-            self.__data_final = valor
+            self.__data_final = valor.strftime('%Y-%m-%d')
 
     def buscar_ativo(self,) -> pd.DataFrame:
         """
         It downloads the stock data from Yahoo Finance, and returns a pandas dataframe
         :return: A dataframe with the stock data.
         """
-        # try:
         yf_ativo = self.download_ativos()
-
-        # except Exception as exception:
-        #     print(exception)
-        #     yf_ativo = pd.DataFrame([])
-
-        # finally:
         return yf_ativo
 
-    def __dias_intervalo(self, data_inicial, data_final):
+    def __dias_intervalo(self, data_inicial: str, data_final: str) -> int:
         dias = (datetime.strptime(data_inicial, '%Y-%m-%d') -
                 datetime.strptime(data_final, '%Y-%m-%d')).days
         return abs(dias)
 
-    def download_ativos(self):
-        if self.intervalo in ['1m', '2m', '5m', '15m', '30m'] and self.__dias_intervalo(self.data_inicial, self.data_final) > 7 and self.__check_range_data():
-            datas = self.__lista_data()
-            yf_ativo = pd.DataFrame()
-            for inicio, fim in datas:
-                yf_ativo = pd.concat([yf_ativo, yf.download(self.ativo, end=fim,
-                                                            start=inicio, interval=self.intervalo)])
-            return yf_ativo
-        else:
-            return yf.download(self.ativo, end=self.data_final,
-                               start=self.data_inicial, interval=self.intervalo)
+    def download_ativos(self) -> pd.DataFrame:
+        try:
+            if self.intervalo in ['1m', '2m', '5m', '15m', '30m'] and self.__dias_intervalo(self.data_inicial, self.data_final) > 7:
+                datas = self.__lista_data()
+                yf_ativo = pd.DataFrame()
+                for inicio, fim in datas:
+                    yf_ativo = pd.concat([yf_ativo, yf.download(self.ativo, end=fim,
+                                                                start=inicio, interval=self.intervalo, session=self.session)])
+                return yf_ativo
+            else:
+                return yf.download(self.ativo, end=self.data_final,
+                                   start=self.data_inicial, interval=self.intervalo, session=self.session)
+        except:
+            return pd.DataFrame()
 
     def __lista_data(self):
         datas = []
@@ -136,28 +136,30 @@ class AtivoController(object):
                     dia_apos, '+', dias_reduzidos)))
         return datas
 
-    def __adicionar_remover_dias(self, data: str, operador: str, dias: int) -> str | bool:
+    @staticmethod
+    def __adicionar_remover_dias(data: str, operador: str, dias: int) -> str:
         match operador:
             case '-':
                 return (datetime.strptime(data, '%Y-%m-%d') - timedelta(days=dias)).strftime('%Y-%m-%d')
             case '+':
                 return (datetime.strptime(data, '%Y-%m-%d') + timedelta(days=dias)).strftime('%Y-%m-%d')
             case _:
-                return False
+                return ''
 
-    def __check_range_data(self):
-        match self.intervalo:
-            case '1m':
-                return (datetime.now() - datetime.strptime(self.data_inicial, '%Y-%m-%d')).days <= 30
-            case '2m' | '5m' | '15m' | '30m':
-                return (datetime.now() - datetime.strptime(self.data_inicial, '%Y-%m-%d')).days <= 30
-    # def __buscar_periodo(self):
+    # def __check_range_data(self):
     #     match self.intervalo:
     #         case '1m':
+    #             return (datetime.now() - datetime.strptime(self.data_inicial, '%Y-%m-%d')).days <= 30
+    #         case '2m' | '5m' | '15m' | '30m':
+    #             return (datetime.now() - datetime.strptime(self.data_inicial, '%Y-%m-%d')).days <= 30
+
+    def infor_ativo(self):
+        return yf.Ticker(self.ativo)
 
 
 if __name__ == '__main__':
-    ativo = AtivoController('GOOG', '2022-10-15', '2022-11-03', '1m')
-    print(ativo.buscar_ativo())
-    # print(yf.download('GOOG', start='2022-10-28',
-    #                   end='2022-11-03', interval='1m'))
+    # ativo = AtivoController('GOOG', '2022-10-10', '2022-10-17', '1m')
+    # print(ativo.download_ativos())
+    # print(yf.download('GOOG', start='2000-10-15',
+    #                   end='2022-11-03', interval='1d'))
+    pass
