@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+import scipy.stats as stats
 
 from core import st
 from core.controller import AtivoController
@@ -32,50 +33,70 @@ class Programa(Validacao):
                 self.acao, self.data_inicial, self.data_final, self.intervalo)
             dados_carregado = self.acao_controller.download_ativos()
             if dados_carregado.size:  # type: ignore
+                preparacao = Preparacao(dados_carregado)
                 with self.st.expander('Gráfico em candlestick'):
                     self.grafico_candlestick(dados_carregado)
-                col1, col2, col3 = self.st.columns(3)
+                with self.st.expander('Gráfico Histograma'):
+                    self.grafico_qqplot(preparacao.serie)
+                col1, col2, col3, col4, col5 = self.st.columns(5)
                 with col1:
                     self.st.write('Preço atual')
                     self.st.write(dados_carregado['Close'].iloc[-1])
                 with col2:
-                    self.st.write('Mediana')
+                    self.st.write('Mediana do período')
                     self.st.write(dados_carregado['Close'].median())
                 with col3:
-                    self.st.write('Log retorno')
-                    self.st.write(np.log(dados_carregado['Close'].iloc[-1]))
-                preparacao = Preparacao(dados_carregado)
-                with self.st.expander('Gráfico da decompose_serie'):
-                    self.grafico_decompose(
-                        preparacao.decompose_serie.seasonal)
-                with self.st.expander('Gráfico QQ Normal Plot'):
-                    self.grafico_qqplot(preparacao.serie)
-
-                self.st.header('Teste de shapiro')
-                col3, col4 = self.st.columns(2)
-                with col3:
-                    self.st.write(f'Estatíca do teste: ',
-                                  preparacao.teste_shapiro[0])
+                    self.st.write('Taxa retorno do período')
+                    self.st.write(round(np.log(
+                        dados_carregado['Close'].iloc[1] / dados_carregado['Close'].iloc[-1]) * 100, 2))
                 with col4:
-                    self.st.write(f'p-valor: ', preparacao.teste_shapiro[1])
+                    self.st.write('Taxa de retorno intervalo')
+                    self.st.write(round(np.log(
+                        dados_carregado['Close'].iloc[-1] / dados_carregado['Close'].iloc[-2])*100, 2))
+                with col5:
+                    self.st.write('Coeficiente de variação')
+                    self.st.write()
+                if dados_carregado.size < 30:
+                    self.st.header('Teste de shapiro')
+                    col10, col11 = self.st.columns(2)
+                    with col10:
+                        self.st.write(f'Estatíca do teste: ',
+                                      preparacao.teste_shapiro[0])
+                    with col11:
+                        self.st.write(
+                            f'p-valor: ', preparacao.teste_shapiro[1])
+
+                    if preparacao.teste_shapiro[1] < 0.05:
+                        st.write('')
+                else:
+                    self.st.header('Teste de Kolmogorov-Smirnov')
+                    col20, col21 = self.st.columns(2)
+                    with col20:
+                        self.st.write(
+                            'p-valor: ',
+                            preparacao.teste_ksmirnov[1][0])
+                    if preparacao.teste_ksmirnov[1][0] > 0.05:
+                        self.st.success('É uma distribuição normal')
+                    else:
+                        self.st.error('Não é uma distribuição normal')
             else:
                 st.warning('Dados não encontrados!')
 
     def grafico_candlestick(self, dataframe: pd.DataFrame) -> None:
         range_lines = self.st.checkbox('Ranges Lider')
         fig = go.Figure(data=[go.Candlestick(x=dataframe.index, open=dataframe['Open'],
-                        high=dataframe['High'], low=dataframe['Low'], close=dataframe['Close'])])
-        fig.update_layout(xaxis_rangeslider_visible=False)
-        self.st.plotly_chart(fig, use_container_width=range_lines)
-
-    def grafico_decompose(self, serie: pd.Series) -> None:
-        fig = go.Figure(
-            data=[go.Scatter(x=serie.index, y=serie)])
+                                             high=dataframe['High'], low=dataframe['Low'], close=dataframe['Close'])])
+        fig.update_layout(xaxis_rangeslider_visible=range_lines)
         self.st.plotly_chart(fig, use_container_width=True)
 
-    def grafico_qqplot(self, serie: pd.Series):
+    # def grafico_decompose(self, serie: pd.DataFrame) -> None:
+    #     fig = go.Figure(
+    #         data=[go.Scatter(x=serie.index, y=serie)])
+    #     self.st.plotly_chart(fig, use_container_width=True)
+
+    def grafico_qqplot(self, serie: pd.DataFrame):
         fig = go.Figure(
-            data=[go.Line(x=serie.index, y=serie)])
+            data=[go.Histogram(x=serie.Close)])
         self.st.plotly_chart(fig, use_container_width=True)
 
     def main(self) -> None:
@@ -97,7 +118,6 @@ class Programa(Validacao):
 
     def __validacao_campos(self) -> bool:
         if self.acao:
-
             return True
         else:
             self.st.sidebar.warning(

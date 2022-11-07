@@ -86,7 +86,8 @@ class AtivoController(object):
             self.__data_final = (datetime.strptime(
                 valor, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
         else:
-            self.__data_final = valor.strftime('%Y-%m-%d')
+            self.__data_final = (valor + timedelta(days=1)
+                                 ).strftime('%Y-%m-%d')
 
     def buscar_ativo(self,) -> pd.DataFrame:
         """
@@ -146,13 +147,6 @@ class AtivoController(object):
             case _:
                 return ''
 
-    # def __check_range_data(self):
-    #     match self.intervalo:
-    #         case '1m':
-    #             return (datetime.now() - datetime.strptime(self.data_inicial, '%Y-%m-%d')).days <= 30
-    #         case '2m' | '5m' | '15m' | '30m':
-    #             return (datetime.now() - datetime.strptime(self.data_inicial, '%Y-%m-%d')).days <= 30
-
     def infor_ativo(self):
         return yf.Ticker(self.ativo)
 
@@ -160,6 +154,5 @@ class AtivoController(object):
 if __name__ == '__main__':
     # ativo = AtivoController('GOOG', '2022-10-10', '2022-10-17', '1m')
     # print(ativo.download_ativos())
-    # print(yf.download('GOOG', start='2000-10-15',
-    #                   end='2022-11-03', interval='1d'))
-    pass
+    print(yf.download('GOOG', start='2000-11-01',
+                      end='2022-11-08', interval='1d'))
