@@ -1,6 +1,7 @@
+import numpy as np
 import pandas as pd
 import scipy.stats as stats
-from statsmodels.tsa.seasonal import DecomposeResult, seasonal_decompose
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 
 class Preparacao:
@@ -9,18 +10,24 @@ class Preparacao:
         self.serie = self.preparando_serie
 
     @property
-    def preparando_serie(self) -> pd.DataFrame:
-        return pd.DataFrame(index=pd.to_datetime(self.dataframe.index),
-                            data=self.dataframe.Close.to_list(), columns=['Close'])
-
-    # @property
-    # def decompose_serie(self) -> DecomposeResult:
-    #     return seasonal_decompose(self.preparando_serie)
+    def preparando_serie(self) -> pd.Series:
+        return self.dataframe['Close'].copy()
+        # return pd.Series(index=pd.to_datetime(self.dataframe.index), data=self.dataframe.Close.to_list())
 
     @property
-    def teste_shapiro(self) -> tuple:
-        return stats.shapiro(self.serie)
+    def preparando_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(index=self.dataframe.index, data=self.normalizacao_log.tolist(), columns=['Close'])
 
     @property
-    def teste_ksmirnov(self) -> tuple:
-        return stats.normaltest(self.serie)
+    def normalizacao_log(self):
+        return np.log(self.serie.copy())
+
+    @property
+    def decomposicao(self):
+        return seasonal_decompose(self.serie, period=self.serie.size // 2)
+
+    def teste_shapiro(self, serie) -> tuple:
+        return stats.shapiro(serie)
+
+    def teste_person(self, dataframe) -> tuple:
+        return stats.normaltest(pd.DataFrame(index=dataframe.index, data=dataframe.Close.to_list(), columns=['Close']))
