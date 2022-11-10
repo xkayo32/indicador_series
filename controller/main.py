@@ -5,17 +5,17 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import scipy.stats as stats
+import streamlit
 
-from core import st
-from core.controller import AtivoController
-from core.machine import Preparacao
-from core.validacao import Validacao
+from controller.controller import AtivoController
+from controller.machine import Preparacao
+from controller.validacao import Validacao
 
 
 class Programa(Validacao):
     def __init__(self) -> None:
         super().__init__()
-        self.st = st
+        self.st = streamlit
         self.st.set_page_config(page_title='Sistema de recomendação', layout='wide',
                                 page_icon='📈', initial_sidebar_state="auto", menu_items=None)
         self.main()
@@ -29,13 +29,13 @@ class Programa(Validacao):
 
     def body(self) -> None:
         self.st.title('Previsão de séries temporais 📈')
-        tab1, tab2, tab3 = self.st.tabs(
-            ['Análise', 'Normalização', 'Previsão'])
+        tab1, tab2 = self.st.tabs(
+            ['Análise', 'Previsão'])
         if self.__validacao_campos():
             self.acao_controller = AtivoController(
                 self.acao, self.data_inicial, self.data_final, self.intervalo)
             dados_carregado = self.acao_controller.download_ativos()
-            if dados_carregado.size:  # type: ignore
+            if dados_carregado.shape[0] >= 14:  # type: ignore
                 with tab1:
                     preparacao = Preparacao(dados_carregado)
                     with self.st.expander('Gráfico em candlestick'):
@@ -44,14 +44,14 @@ class Programa(Validacao):
                         self.grafico_histograma(preparacao.serie)
                     with self.st.expander('Gráfico de tendencia'):
                         self.grafico_decomposicao(
-                            preparacao.decomposicao.trend, 'Gráfico de tendencia')
+                            preparacao.decomposicao(preparacao.serie).trend, 'Gráfico de tendencia')
                     with self.st.expander('Gráfico sazonal'):
                         self.grafico_decomposicao(
-                            preparacao.decomposicao.seasonal, 'Gráfico sazonal')
+                            preparacao.decomposicao(preparacao.serie).seasonal, 'Gráfico sazonal')
                     with self.st.expander('Gráfico aleatoria'):
                         self.grafico_decomposicao(
-                            preparacao.decomposicao.resid, 'Gráfico aleatoria')
-                    col1, col2, col3, col4, col5, col6 = self.st.columns(6)
+                            preparacao.decomposicao(preparacao.serie).resid, 'Gráfico aleatoria')
+                    col1, col2, col3, col4, col5 = self.st.columns(5)
                     with col1:
                         self.st.write('Preço atual')
                         self.st.write(dados_carregado['Close'].iloc[-1])
@@ -61,81 +61,87 @@ class Programa(Validacao):
                     with col3:
                         self.st.write('Taxa retorno do período')
                         self.st.write(round(np.log(
-                            dados_carregado['Close'].iloc[0] / dados_carregado['Close'].iloc[-1]) * 100, 2))
+                            dados_carregado['Close'].iloc[-1] / dados_carregado['Close'].iloc[0]) * 100, 2))
                     with col4:
-                        self.st.write('Taxa de retorno intervalo')
+                        self.st.write(
+                            f'Taxa de retorno intervalo "{self.intervalo}"')
                         self.st.write(round(np.log(
                             dados_carregado['Close'].iloc[-1] / dados_carregado['Close'].iloc[-2]) * 100, 2))
                     with col5:
                         self.st.write('Desvio padrão do período')
                         self.st.write(self.__retorno_logaritimo_periodo(
                             dados_carregado).std())
-                    with col6:
-                        self.st.write('Coef de variação do período')
-                        self.st.write(stats.variation(
-                            self.__retorno_logaritimo_periodo(dados_carregado)))
-                    if dados_carregado.size < 30:
-                        self.st.header('Teste de shapiro')
-                        col10, col11 = self.st.columns(2)
+                    col_msg, _ = self.st.columns(2)
+                    col10, col11 = self.st.columns(2)
+                    if dados_carregado.shape[0] < 30:
+                        titulo_teste = 'Teste de shapiro'
                         w_c10, p_c10 = preparacao.teste_shapiro(
-                            preparacao.serie)[0]
-                        with col10:
-                            self.st.write(f'Estatíca do teste: ', w_c10
-                                          )
-                        with col11:
-                            self.st.write(
-                                f'p-valor: ', p_c10)
-
-                        if p_c10 > 0.05:
-                            self.st.success('É uma distribuição normal')
-                            normalizar = False
-                        else:
-                            self.st.error('Não é uma distribuição normal')
-                            normalizar = True
+                            preparacao.serie)
                     else:
-                        self.st.header('Teste de D’Agostino and Pearson’s')
-                        col20, col21 = self.st.columns(2)
-                        w_c20, p_c20 = preparacao.teste_person(
-                            preparacao.dataframe)
-                        with col20:
-                            self.st.write('Estatíca do teste: ', w_c20[0])
-                        with col21:
-                            self.st.write('p-valor: ', p_c20[0])
-                        if p_c20 > 0.05:
-                            self.st.success('É uma distribuição normal')
-                            normalizar = False
-                        else:
-                            self.st.error('Não é uma distribuição normal')
-                            normalizar = True
+                        titulo_teste = "Teste D'Agostino Pearson"
+                        w_c10, p_c10 = preparacao.teste_person(
+                            preparacao.serie)
+                    with col_msg:
+                        self.st.header(titulo_teste)
+                    with col10:
+                        self.st.write(f'Estatíca do teste: ', w_c10
+                                      )
+                    with col11:
+                        self.st.write(
+                            f'p-valor: ', p_c10)
+                    if p_c10 > 0.05:
+                        self.st.success('É uma distribuição normal')
+                        normalizar = False
+                    else:
+                        self.st.error('Não é uma distribuição normal')
+                        normalizar = True
                     with tab2:
-                        if normalizar:
-                            with self.st.expander('Gráfico histograma'):
-                                self.grafico_histograma(
-                                    preparacao.normalizacao_log)
-                            if preparacao.normalizacao_log.size < 30:
-                                col30, col31 = self.st.columns(2)
-                                w_c30, p_c30 = preparacao.teste_shapiro(
-                                    preparacao.normalizacao_log)
-                                with col30:
-                                    self.st.write('Estatíca do teste: ', w_c30)
-                                with col31:
-                                    self.st.write('p-valor: ', p_c30)
+                        algo_escolha = self.st.radio(
+                            'Auto ARIMA', ('OFF', 'ON'), help='Com Auto ARIMA ativado pode demorar varios minutos para testar todos os parametros', horizontal=True)
+                        if algo_escolha == 'OFF':
+                            col_ar, col_i, col_ma = self.st.columns(3)
+                            with col_ar:
+                                ar_p = self.st.number_input(
+                                    'AR', min_value=0, max_value=20, step=1, help='Modelo Auto Regressivo', value=1)
+                            with col_i:
+                                ar_d = self.st.number_input(
+                                    'I', min_value=0, max_value=20, step=1, help='Número de diferenciações', value=1)
+                            with col_ma:
+                                ar_q = self.st.number_input(
+                                    'MA', min_value=0, max_value=20, step=1, help='Média Móveis', value=1)
+                            treinado = preparacao.arima_teste(
+                                preparacao.serie, int(ar_p), int(ar_d), int(ar_q))
+                            residuos_arima = treinado.resid
+                            self.st.write('')
+                            with self.st.expander('Informações do algoritimo'):
+                                self.st.write(treinado.summary())
+                            with self.st.expander('Grafico da previsão'):
+                                pass
+                            self.st.dataframe(
+                                preparacao.previsao_arima(4))
+                            col_res1, col_res2 = self.st.columns(2)
+                            if len(residuos_arima) < 30:
+                                w_res1, p_res2 = preparacao.teste_shapiro(
+                                    residuos_arima)
                             else:
-                                col40, col41 = self.st.columns(2)
-                                w_c40, p_c40 = preparacao.teste_person(
-                                    preparacao.preparando_dataframe)
-                                with col40:
-                                    self.st.write(
-                                        'Estatíca do teste: ', w_c40[0])
-                                with col41:
-                                    self.st.write('p-valor: ', p_c40[0])
+                                w_res1, p_res2 = preparacao.teste_person(
+                                    residuos_arima)
+                            with col_res1:
+                                self.st.write('Estatíca do teste: ', w_res1)
+                            with col_res2:
+                                self.st.write('p-valor: ', p_res2)
                         else:
-                            self.st.success(
-                                'Oba! Os dados já estão normalizados')
-                    with tab3:
-                        self.st.success('Aguardando')
+                            treinado_auto = preparacao.auto_arima_teste(
+                                preparacao.serie)
+                            self.st.write(
+                                'Parametros do auto ARIMA: ', treinado_auto.order)
+                            self.st.write(
+                                preparacao.previsao_auto_arima(treinado_auto, preparacao.serie, 4))
+                            self.st.dataframe(
+                                preparacao.teste_treinamento_auto_arima())
+
             else:
-                st.warning('Dados não encontrados!')
+                self.st.warning('Dados não encontrados!')
 
     def grafico_candlestick(self, dataframe: pd.DataFrame) -> None:
         range_lines = self.st.checkbox('Ranges Lider')
@@ -149,7 +155,7 @@ class Programa(Validacao):
             data=[go.Histogram(x=serie)])
         self.st.plotly_chart(fig, use_container_width=True)
 
-    def grafico_decomposicao(self, serie, titulo: str) -> None:
+    def grafico_decomposicao(self, serie: pd.Series, titulo: str) -> None:
         fig = px.line(title=titulo).add_scatter(y=serie, x=serie.index)
         self.st.plotly_chart(fig, use_container_width=True)
 

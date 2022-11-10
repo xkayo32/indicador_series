@@ -3,15 +3,16 @@
 
 # Importing the datetime module, the pandas module and the yfinance module.
 from datetime import datetime, timedelta
-from typing import Union
 
 import pandas as pd
 import requests_cache
 import yfinance as yf
 
+from controller.machine import Preparacao
+
 
 # > This class is used to get data from the Alpha Vantage API.
-class AtivoController(object):
+class AtivoController(Preparacao):
     def __init__(self, ativo: str, data_inicial: str, data_final: str, intervalo: str = '1d') -> None:
         """
         A constructor of the class.
@@ -22,7 +23,7 @@ class AtivoController(object):
         :type data_inicial: str
         :param data_final: The end date for the data series
         :type data_final: str
-        :param intervalo: The interval of time between each data point. valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
+        :param intervalo: The interval of time between each data point. valiWd intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
         :type intervalo: str 
         """
         self.session = requests_cache.CachedSession('yfinance.cache')
@@ -31,6 +32,9 @@ class AtivoController(object):
         self.data_final = data_final
         self.ativo = ativo
         self.intervalo = intervalo
+        self.base_dados: pd.DataFrame = self.__download_ativos()
+        super().__init__(self.base_dados)
+
 
     @property
     def ativo(self):
@@ -89,31 +93,23 @@ class AtivoController(object):
             self.__data_final = (valor + timedelta(days=1)
                                  ).strftime('%Y-%m-%d')
 
-    def buscar_ativo(self,) -> pd.DataFrame:
-        """
-        It downloads the stock data from Yahoo Finance, and returns a pandas dataframe
-        :return: A dataframe with the stock data.
-        """
-        yf_ativo = self.download_ativos()
-        return yf_ativo
-
     def __dias_intervalo(self, data_inicial: str, data_final: str) -> int:
         dias = (datetime.strptime(data_inicial, '%Y-%m-%d') -
                 datetime.strptime(data_final, '%Y-%m-%d')).days
         return abs(dias)
 
-    def download_ativos(self) -> pd.DataFrame:
+    def __download_ativos(self) -> pd.DataFrame:
         try:
             if self.intervalo in ['1m', '2m', '5m', '15m', '30m'] and self.__dias_intervalo(self.data_inicial, self.data_final) > 7:
                 datas = self.__lista_data()
                 yf_ativo = pd.DataFrame()
                 for inicio, fim in datas:
                     yf_ativo = pd.concat([yf_ativo, yf.download(self.ativo, end=fim,
-                                                                start=inicio, interval=self.intervalo, session=self.session)])
+                                                                start=inicio, interval=self.intervalo)],session=self.session)
                 return yf_ativo
             else:
                 return yf.download(self.ativo, end=self.data_final,
-                                   start=self.data_inicial, interval=self.intervalo, session=self.session)
+                                   start=self.data_inicial, interval=self.intervalo,session=self.session)
         except:
             return pd.DataFrame()
 
@@ -152,7 +148,5 @@ class AtivoController(object):
 
 
 if __name__ == '__main__':
-    # ativo = AtivoController('GOOG', '2022-10-10', '2022-10-17', '1m')
-    # print(ativo.download_ativos())
-    print(yf.download('GOOG', start='2000-11-01',
-                      end='2022-11-08', interval='1d'))
+    ativo = AtivoController('PETR4.SA', '2022-06-01', '2022-11-08', '1d')
+    preparacao = Preparacao(ativo.base_dados)
