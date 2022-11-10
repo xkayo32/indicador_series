@@ -5,7 +5,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import scipy.stats as stats
-import streamlit
 
 from controller.controller import AtivoController
 from controller.machine import Preparacao
@@ -15,7 +14,6 @@ from controller.validacao import Validacao
 class Programa(Validacao):
     def __init__(self) -> None:
         super().__init__()
-        self.st = streamlit
         self.st.set_page_config(page_title='Sistema de recomendação', layout='wide',
                                 page_icon='📈', initial_sidebar_state="auto", menu_items=None)
         self.main()

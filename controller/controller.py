@@ -1,14 +1,19 @@
 """ Kayo Carvalho Fernandes
 """
 
-# Importing the datetime module, the pandas module and the yfinance module.
+import warnings
 from datetime import datetime, timedelta
 
 import pandas as pd
 import requests_cache
 import yfinance as yf
+from machine import Preparacao
+from rich import print
+from rich.console import Console
+from rich.panel import Panel
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-from controller.machine import Preparacao
+warnings.filterwarnings("ignore")
 
 
 # > This class is used to get data from the Alpha Vantage API.
@@ -34,7 +39,6 @@ class AtivoController(Preparacao):
         self.intervalo = intervalo
         self.base_dados: pd.DataFrame = self.__download_ativos()
         super().__init__(self.base_dados)
-
 
     @property
     def ativo(self):
@@ -105,11 +109,11 @@ class AtivoController(Preparacao):
                 yf_ativo = pd.DataFrame()
                 for inicio, fim in datas:
                     yf_ativo = pd.concat([yf_ativo, yf.download(self.ativo, end=fim,
-                                                                start=inicio, interval=self.intervalo)],session=self.session)
+                                                                start=inicio, interval=self.intervalo)], session=self.session)
                 return yf_ativo
             else:
                 return yf.download(self.ativo, end=self.data_final,
-                                   start=self.data_inicial, interval=self.intervalo,session=self.session)
+                                   start=self.data_inicial, interval=self.intervalo, session=self.session)
         except:
             return pd.DataFrame()
 
@@ -143,10 +147,52 @@ class AtivoController(Preparacao):
             case _:
                 return ''
 
+    @property
     def infor_ativo(self):
         return yf.Ticker(self.ativo)
 
 
 if __name__ == '__main__':
-    ativo = AtivoController('PETR4.SA', '2022-06-01', '2022-11-08', '1d')
+    console = Console()
+    acao = 'PETR4.SA'
+    ativo = AtivoController(acao, '2022-01-01', '2022-11-09', '1d')
     preparacao = Preparacao(ativo.base_dados)
+    serie = preparacao.serie
+    # tabela = Table(title=f'{ativo.infor_ativo.info["shortName"]}')
+    # tabela.add_column(f'{serie.index.name}',
+    #                   justify='center', style='cyan')
+    # tabela.add_column(f'{serie.name}', justify='center',
+    #                   style='magenta')
+    # for i, v in serie.items():
+    #     tabela.add_row(str(i), str(v))
+    if serie.size < 30:
+        nome_teste = 'Shapiro Wilk'
+        w, p = preparacao.teste_shapiro(serie)
+    else:
+        nome_teste = "D'Agostino-Pearson"
+
+        w, p = preparacao.teste_person(serie)
+    teste = (
+        f'[bold]Estatística do teste: [blue]{w}[/blue]\n[bold]p-valor: [blue]{p}')
+    if p < 0.05:
+        tipo_distribuicao = ("[red]Distruibuição não normal\n")
+    else:
+        tipo_distribuicao = ("[green]Distribuição normal\n")
+    print(Panel(f"Valores do teste de [bold magenta]{nome_teste}[/bold magenta]\n\n{teste}",
+          title="[bold]Teste de confiança[/bold]", subtitle=f"{tipo_distribuicao}"))
+    algoritimo = preparacao.teste_treinamento_auto_arima()
+    resultado_mean = mean_absolute_error(
+        algoritimo['Fechamento'], algoritimo['Previsão'])
+    resultado_meansq = mean_squared_error(
+        algoritimo['Fechamento'], algoritimo['Previsão'])
+    print('\n')
+    print(Panel(f"Teste do Erro absoluto médio [bold magenta]MAE[/bold magenta]\n\nMAE: [blue]{resultado_mean}[/blue]\nRMSE: [blue]{resultado_meansq}[/blue]",
+          title="[bold]Auto ARIMA - Teste de precisão[/bold]", subtitle=f"{'[green]APROVADO[/green]' if resultado_mean*2 < resultado_meansq else '[red]REPROVADO[/red]'}"))
+    algoritimo2 = preparacao.teste_treinamento_prophet()
+    resultado_mean2 = mean_absolute_error(
+        algoritimo2['y'], algoritimo2['yhat'])
+    resultado_meansq2 = mean_squared_error(
+        algoritimo2['y'], algoritimo2['yhat'])
+    print('\n')
+    print(Panel(f"Teste do Erro absoluto médio [bold magenta]MAE[/bold magenta]\n\nMAE: [blue]{resultado_mean2}[/blue]\nRMSE: [blue]{resultado_meansq2}[/blue]",
+          title="[bold]Prophet - Teste de precisão[/bold]", subtitle=f"{'[green]APROVADO[/green]' if resultado_mean2*2 < resultado_meansq2 else '[red]REPROVADO[/red]'}"))
