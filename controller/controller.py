@@ -47,7 +47,7 @@ if __name__ == '__main__':
         algoritimo['Fechamento'], algoritimo['Previsão'])
     print('\n')
     print(Panel(f"Teste do Erro absoluto médio [bold magenta]MAE[/bold magenta]\n\nMAE: [blue]{resultado_mean}[/blue]\nRMSE: [blue]{resultado_meansq}[/blue]",
-          title="[bold]Auto ARIMA - Teste de precisão[/bold]", subtitle=f"{'[green]APROVADO[/green]' if (resultado_mean*2) < resultado_meansq else '[red]REPROVADO[/red]'}"))
+          title="[bold]Auto ARIMA - Teste de precisão[/bold]", subtitle=f"{'[green]APROVADO[/green]' if (resultado_mean*2) > resultado_meansq else '[red]REPROVADO[/red]'}"))
     algoritimo2 = preparacao.teste_treinamento_prophet(dataframe)
     resultado_mean2 = mean_absolute_error(
         algoritimo2['Close'], algoritimo2['yhat'])
@@ -55,4 +55,4 @@ if __name__ == '__main__':
         algoritimo2['Close'], algoritimo2['yhat'])
     print('\n')
     print(Panel(f"Teste do Erro absoluto médio [bold magenta]MAE[/bold magenta]\n\nMAE: [blue]{resultado_mean2}[/blue]\nRMSE: [blue]{resultado_meansq2}[/blue]",
-          title="[bold]Prophet - Teste de precisão[/bold]", subtitle=f"{'[green]APROVADO[/green]' if (resultado_mean2*2) < resultado_meansq2 else '[red]REPROVADO[/red]'}"))
+          title="[bold]Prophet - Teste de precisão[/bold]", subtitle=f"{'[green]APROVADO[/green]' if (resultado_mean2*2) > resultado_meansq2 else '[red]REPROVADO[/red]'}"))
