@@ -18,6 +18,7 @@ class Preparacao:
         :type dataframe: pd.DataFrame
         """
         self.modelo_prophet = Prophet()
+        
 
     def preparando_serie(self,dataframe:pd.DataFrame) -> pd.Series:
         """
@@ -104,6 +105,16 @@ class Preparacao:
         resultado = self.auto_arima_teste(base_treino)
         return self.__previsao_auto_arima(resultado, base_treino, base_teste=base_teste, dias=base_teste.shape[0])
 
+    def previsao_prophet(self, dataframe:pd.DataFrame):
+        dataframe = self.__serie_to_dataframe_prophet(dataframe)
+        modelo_prophet = Prophet()
+        modelo_prophet.fit(dataframe)
+        futuro = modelo_prophet.make_future_dataframe(periods=8)
+        previsores = modelo_prophet.predict(futuro)
+        previsores = previsores[['ds','yhat', 'yhat_lower', 'yhat_upper']]
+        previsores.columns = ['data','fechamento_previsto','minima_previsto','maxima_previsto']
+        return previsores
+
     def teste_treinamento_prophet(self,dataframe: pd.DataFrame):
         """
         It takes a series, splits it into training and testing sets, and then uses the training set to fit
@@ -111,10 +122,10 @@ class Preparacao:
         :return: The result of the test is being returned.
         """
         base_dados_prophet = self.__serie_to_dataframe_prophet(dataframe)
-        tamanho_base = math.ceil(base_dados_prophet.shape[0] * 0.90)
+        tamanho_base = math.ceil(base_dados_prophet.shape[0] * 0.80)
         base_treino = base_dados_prophet[:tamanho_base]
         base_teste = dataframe[tamanho_base:]
-        self.prophet_teste(base_treino)
+        self.modelo_prophet.fit(base_treino)
         return self.__previsao_prophet(base_teste=base_teste, dias=base_teste.shape[0])
 
     def __previsao_prophet(self, base_teste, dias=4):
@@ -130,6 +141,4 @@ class Preparacao:
         dataframe.columns = ['ds', 'y']
         return dataframe
 
-    def prophet_teste(self, dataframe: pd.DataFrame):
-        return self.modelo_prophet.fit(dataframe)
  
