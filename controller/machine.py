@@ -10,24 +10,21 @@ from statsmodels.tsa.seasonal import DecomposeResult, seasonal_decompose
 
 
 class Preparacao:
-    def __init__(self, dataframe: pd.DataFrame) -> None:
+    def __init__(self) -> None:
         """
         > The function `__init__` receives a dataframe and assigns it to the attribute `__dataframe`
 
         :param dataframe: The dataframe that will be used to create the series
         :type dataframe: pd.DataFrame
         """
-        self.__dataframe = dataframe
-        self.serie = self.preparando_serie
         self.modelo_prophet = Prophet()
 
-    @property
-    def preparando_serie(self) -> pd.Series:
+    def preparando_serie(self,dataframe:pd.DataFrame) -> pd.Series:
         """
         It returns a series with the closing price of the stock
         : return: A series with the closing price of the stock.
         """
-        serie: pd.Series = self.__dataframe['Close']
+        serie: pd.Series = dataframe['Close'].copy()
         serie.name = 'Fechamento'
         return serie
 
@@ -39,7 +36,7 @@ class Preparacao:
         :type serie: pd.Series
         :return: The decomposition of the series into trend, seasonal and residual components.
         """
-        resultado = seasonal_decompose(serie, period=serie.size // 2)
+        resultado = seasonal_decompose(serie, period=serie.shape[0] // 2)
         return resultado
 
     def teste_shapiro(self, serie) -> tuple:
@@ -95,42 +92,44 @@ class Preparacao:
         dataframe = dataframe.join(base_teste)
         return dataframe
 
-    def teste_treinamento_auto_arima(self):
+    def teste_treinamento_auto_arima(self,serie: pd.Series):
         """
         It takes a series, splits it into training and testing sets, and then uses the training set to fit
         an ARIMA model. The model is then used to make predictions on the test set
         :return: The result of the test is being returned.
         """
-        tamanho_base = math.ceil(self.serie.size * 0.80)
-        base_treino = self.serie[:tamanho_base]
-        base_teste = self.serie[tamanho_base:]
+        tamanho_base = math.ceil(serie.shape[0] * 0.80)
+        base_treino = serie[:tamanho_base]
+        base_teste = serie[tamanho_base:]
         resultado = self.auto_arima_teste(base_treino)
-        return self.__previsao_auto_arima(resultado, base_treino, base_teste=base_teste, dias=base_teste.size)
+        return self.__previsao_auto_arima(resultado, base_treino, base_teste=base_teste, dias=base_teste.shape[0])
 
-    def teste_treinamento_prophet(self):
+    def teste_treinamento_prophet(self,dataframe: pd.DataFrame):
         """
         It takes a series, splits it into training and testing sets, and then uses the training set to fit
         an ARIMA model. The model is then used to make predictions on the test set
         :return: The result of the test is being returned.
         """
-        base_dados_prophet = self.__serie_to_dataframe_prophet(self.serie)
-        tamanho_base = math.ceil(base_dados_prophet.size * 0.80)
+        base_dados_prophet = self.__serie_to_dataframe_prophet(dataframe)
+        tamanho_base = math.ceil(base_dados_prophet.shape[0] * 0.90)
         base_treino = base_dados_prophet[:tamanho_base]
-        base_teste = base_dados_prophet[tamanho_base:]
+        base_teste = dataframe[tamanho_base:]
         self.prophet_teste(base_treino)
-        return self.__previsao_prophet(base_teste=base_teste, dias=base_teste.size)
+        return self.__previsao_prophet(base_teste=base_teste, dias=base_teste.shape[0])
 
     def __previsao_prophet(self, base_teste, dias=4):
         futuro = self.modelo_prophet.make_future_dataframe(periods=dias)
         previsores = self.modelo_prophet.predict(futuro)
-        print(previsores)
-        return previsores
+        previsores = previsores.tail(dias).set_index('ds')
+        previsores = previsores.join(base_teste)
+        return previsores[['Close','yhat', 'yhat_lower', 'yhat_upper']].dropna()
 
-    def __serie_to_dataframe_prophet(self, serie: pd.DataFrame):
-        dataframe: pd.DataFrame = serie.to_frame()
-        dataframe.reset_index(inplace=True)
+    def __serie_to_dataframe_prophet(self, dataframe: pd.DataFrame):
+        dataframe = dataframe['Close'].to_frame()
+        dataframe = dataframe.reset_index()
         dataframe.columns = ['ds', 'y']
         return dataframe
 
     def prophet_teste(self, dataframe: pd.DataFrame):
         return self.modelo_prophet.fit(dataframe)
+ 
