@@ -1,12 +1,7 @@
 # Importing the necessary libraries for the class to work.
-import math
-from datetime import timedelta
-
 import pandas as pd
 import scipy.stats as stats
-from pmdarima import auto_arima
 from prophet import Prophet
-from statsmodels.tsa.seasonal import DecomposeResult, seasonal_decompose
 
 
 class Preparacao:
@@ -28,17 +23,6 @@ class Preparacao:
         serie: pd.Series = dataframe['Close'].copy()
         serie.name = 'Fechamento'
         return serie
-
-    def decomposicao(self, serie: pd.Series) -> DecomposeResult:
-        """
-        It takes a pandas Series as input and returns a seasonal_decompose object
-
-        :param serie: The time series you want to decompose
-        :type serie: pd.Series
-        :return: The decomposition of the series into trend, seasonal and residual components.
-        """
-        resultado = seasonal_decompose(serie, period=serie.shape[0] // 2)
-        return resultado
 
     def teste_shapiro(self, serie) -> tuple:
         """

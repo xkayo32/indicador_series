@@ -6,7 +6,7 @@ import warnings
 
 import requests_cache
 import yfinance as yf
-from machine import Preparacao
+from controller.machine_stock import Preparacao
 from rich import print
 from rich.console import Console
 from rich.panel import Panel
@@ -23,10 +23,10 @@ session.headers['User-agent'] = 'my-program/1.0'
 
 if __name__ == '__main__':
     console = Console()
-    acao = 'EURUSD=X'
+    acao = 'USDBRL=X'
     preparacao = Preparacao()
     ticker = yf.Ticker(acao,session=session)
-    dataframe = yf.download(acao,start='2022-09-01',end='2022-11-12',interval='1d',session=session,timeout=2)
+    dataframe = yf.download(acao,start='2022-09-01',end='2022-11-07',interval='1d',session=session,timeout=2)
     serie = preparacao.preparando_serie(dataframe)
     if serie.shape[0] < 30:
         nome_teste = 'Shapiro Wilk'
@@ -57,4 +57,4 @@ if __name__ == '__main__':
     console = Console()
     console.print(table)
     console.print(ticker.recommendations)
-    console.print()
+    console.print(ticker.info['regularMarketDayHigh'])

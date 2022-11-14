@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 import scipy.stats as stats
 
 from controller.controller import AtivoController
-from controller.machine import Preparacao
+from controller.machine_stock import Preparacao
 from controller.validacao import Validacao
 
 
