@@ -5,27 +5,35 @@
   <object class="GtkWindow" id="main_window">
     <property name="can-focus">False</property>
     <property name="default-width">440</property>
-    <property name="default-height">400</property>
-    <signal name="destroy-event" handler="on_main_window_destroy_event" swapped="no"/>
+    <property name="default-height">250</property>
+    <property name="icon-name">go-home</property>
     <child>
-      <object class="GtkStack">
+      <object class="GtkStack" id="stack">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="transition-type">crossfade</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="view_login">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="halign">center</property>
             <property name="valign">center</property>
+            <property name="margin-start">30</property>
+            <property name="margin-end">30</property>
+            <property name="margin-top">30</property>
+            <property name="margin-bottom">30</property>
+            <property name="hexpand">False</property>
+            <property name="vexpand">False</property>
             <property name="orientation">vertical</property>
+            <property name="spacing">5</property>
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-bottom">50</property>
                 <property name="label" translatable="yes">Séries Temporais</property>
                 <attributes>
                   <attribute name="style" value="normal"/>
+                  <attribute name="weight" value="bold"/>
                   <attribute name="scale" value="2"/>
                 </attributes>
               </object>
@@ -36,17 +44,15 @@
               </packing>
             </child>
             <child>
-              <object class="GtkComboBoxText" id="select_acao">
+              <object class="GtkImage">
+                <property name="width-request">0</property>
+                <property name="height-request">0</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-bottom">15</property>
-                <property name="active">0</property>
-                <items>
-                  <item id="PETR4.SA" translatable="yes">PETR4</item>
-                  <item id="IRBR3.SA" translatable="yes">IRBR3</item>
-                  <item id="GOOG" translatable="yes">GOOG</item>
-                  <item translatable="yes">BVSP</item>
-                </items>
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">10</property>
+                <property name="pixel-size">133</property>
+                <property name="icon-name">edit-select-all</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -55,14 +61,13 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="input_datainicial">
+              <object class="GtkEntry" id="input_email_login">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="margin-bottom">15</property>
-                <property name="max-length">8</property>
-                <property name="max-width-chars">1</property>
-                <property name="placeholder-text" translatable="yes">10/11/2022</property>
-                <property name="input-purpose">number</property>
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">5</property>
+                <property name="placeholder-text" translatable="yes">Email</property>
+                <property name="input-purpose">email</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -71,13 +76,15 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="input_datafinal">
+              <object class="GtkEntry" id="input_password_login">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="margin-bottom">15</property>
-                <property name="max-length">8</property>
-                <property name="placeholder-text" translatable="yes">10/12/2022</property>
-                <property name="input-purpose">number</property>
+                <property name="margin-top">5</property>
+                <property name="margin-bottom">10</property>
+                <property name="visibility">False</property>
+                <property name="invisible-char">•</property>
+                <property name="placeholder-text" translatable="yes">Password</property>
+                <property name="input-purpose">password</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -86,13 +93,41 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="btn_buscar">
-                <property name="label" translatable="yes">Buscar</property>
+              <object class="GtkButtonBox">
                 <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="margin-bottom">15</property>
-                <signal name="clicked" handler="btn_buscar_clicked_cb" swapped="no"/>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="hexpand">True</property>
+                <property name="spacing">10</property>
+                <property name="layout-style">start</property>
+                <child>
+                  <object class="GtkButton" id="btn_logar">
+                    <property name="label" translatable="yes">Logar</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <signal name="clicked" handler="on_btn_logar_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="btn_cadastrar">
+                    <property name="label" translatable="yes">Cadastra</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <signal name="clicked" handler="on_btn_cadastrar_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -100,10 +135,315 @@
                 <property name="position">4</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkButton">
+                <property name="label" translatable="yes">Esquceu a senha ?</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="halign">end</property>
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">10</property>
+                <property name="hexpand">True</property>
+                <property name="relief">none</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="padding">1</property>
+                <property name="position">5</property>
+              </packing>
+            </child>
           </object>
           <packing>
-            <property name="name">page0</property>
-            <property name="title" translatable="yes">page0</property>
+            <property name="name">view_login</property>
+            <property name="title" translatable="yes">Login</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="view_cadastro">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="valign">center</property>
+            <property name="margin-start">30</property>
+            <property name="margin-end">30</property>
+            <property name="margin-top">30</property>
+            <property name="margin-bottom">30</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">20</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Novo usuario</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                  <attribute name="scale" value="2"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="input_nome_cad">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="primary-icon-tooltip-markup" translatable="yes">Insira seu nome completo.</property>
+                <property name="placeholder-text" translatable="yes">Nome Completo</property>
+                <property name="input-purpose">alpha</property>
+                <property name="input-hints">GTK_INPUT_HINT_UPPERCASE_CHARS | GTK_INPUT_HINT_NONE</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="input_email_cad">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="secondary-icon-tooltip-text" translatable="yes">Insira um email valido.</property>
+                <property name="placeholder-text" translatable="yes">Email</property>
+                <property name="input-purpose">email</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="input_password1_cad">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="visibility">False</property>
+                <property name="invisible-char">•</property>
+                <property name="placeholder-text" translatable="yes">Password</property>
+                <property name="input-purpose">password</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="input_password2_cad">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="visibility">False</property>
+                <property name="invisible-char">•</property>
+                <property name="placeholder-text" translatable="yes">Repetir Password</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButtonBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="spacing">10</property>
+                <property name="layout-style">start</property>
+                <child>
+                  <object class="GtkButton" id="btn_salvar">
+                    <property name="label" translatable="yes">Salvar</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <signal name="clicked" handler="on_btn_salvar_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="btn_voltar">
+                    <property name="label" translatable="yes">Voltar</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <signal name="clicked" handler="on_btn_voltar_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">5</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="name">view_cadastro</property>
+            <property name="title" translatable="yes">Cadastro</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="view_buscar">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkButtonBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="layout-style">start</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="valign">center</property>
+                        <property name="label" translatable="yes">Data Inicial:</property>
+                        <property name="ellipsize">start</property>
+                        <attributes>
+                          <attribute name="style" value="italic"/>
+                          <attribute name="weight" value="bold"/>
+                        </attributes>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="input_dt_inicial">
+                        <property name="name">data_inicial</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="tooltip-text" translatable="yes">Insira apenas numeros neste campo.</property>
+                        <property name="placeholder-text" translatable="yes">10/01/2022</property>
+                        <property name="input-purpose">digits</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Data Final:</property>
+                        <property name="justify">center</property>
+                        <attributes>
+                          <attribute name="style" value="italic"/>
+                          <attribute name="weight" value="bold"/>
+                        </attributes>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="input_dt_final">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="placeholder-text" translatable="yes">30/05/2022</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="combo_acao">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="active">0</property>
+                    <items>
+                      <item id="PETR4.SA" translatable="yes">PETR4</item>
+                      <item id="EURUSD=X" translatable="yes">EUR/USD</item>
+                      <item id="USDBRL=X" translatable="yes">USD/BRL</item>
+                    </items>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="btn_buscar">
+                    <property name="label" translatable="yes">Busca</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <signal name="clicked" handler="on_btn_buscar_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="name">view_buscar</property>
+            <property name="title" translatable="yes">Busca</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
