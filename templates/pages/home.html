@@ -1,28 +1,24 @@
-{% extends 'base/base.html' %}
-{% block title %}{% endblock title %}
-{% block body %}
-<form class="d-flex" action="{% url 'core:previsao_page' %}" method="post">
-    {% csrf_token %}
-    <div class="row">
-        <div class="mb-3">
-            <label for="" class="form-label">Ação</label>
-            <select class="form-select form-select" name="acao" id="" required>
-                <option value="PETR4.SA">PETR4</option>
-                <option value="GOOG">GOOG</option>
-                <option value="IRBR3.SA">IRBR3</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="" class="form-label">Data Inicio</label>
-            <input type="date" name="data_inicial" id="" class="form-control" placeholder="" required>
-        </div>
-        <div class="mb-3">
-            <label for="" class="form-label">Data Fim</label>
-            <input type="date" name="data_final" id="" class="form-control" placeholder="" required>
-        </div>
-        <div class="mb-3">
-            <button type="submit" class="btn btn-primary">Buscar</button>
-        </div>
-    </div>
-</form>
-{% endblock body %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../static/imagem/css/style.css" />
+    <title>Lgoin</title>
+  </head>
+  <body>
+    <!-- img src="../../static/imagem/images_css/imglogin.jpg" /> -->
+    <main>
+      <div class="container_login">
+        <input type="text" placeholder="Login" class="login" />
+        <br />
+
+        <input type="password" placeholder="Senha" class="senha" />
+        <br />
+
+        <button>LOGIN</button>
+      </div>
+    </main>
+  </body>
+</html>

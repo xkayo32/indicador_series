@@ -1,0 +1,50 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: linear-gradient(
+    90deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 9, 121, 1) 21%,
+    rgba(0, 212, 255, 1) 100%
+  );
+}
+
+img {
+  height: 100vh;
+  width: 100vw;
+}
+
+.container_login {
+  background-color: rgba(255, 255, 255, 0.9);
+  position: absolute;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
+  padding: 50px;
+  border-radius: 10px;
+}
+
+.login {
+  margin: 10px;
+  padding: 3px;
+  outline: none;
+}
+
+.senha {
+  margin: 10px;
+  padding: 3px;
+  outline: none;
+}
+
+button {
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  margin-top: 20px;
+  padding: 20px;
+  border: none;
+  width: 100%;
+  border-radius: 15px;
+  font-size: 15px;
+  cursor: pointer;
+}
