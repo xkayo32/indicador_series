@@ -1,5 +1,46 @@
-{% extends 'base/base.html' %}
-{% block title %}Previsão{% endblock title %}
-{% block body %}
-{{fig2|safe}}
+{% extends 'base/base.html' %} {% block title %}Previsão -
+{{infor_ativo.info.longName}}{% endblock title %} {% block body %}
+<div class="text-center">
+  <h1>{{infor_ativo.info.longName}}</h1>
+</div>
+{{fig2.to_html|safe}}
+<div class="card-group">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Mediana</h5>
+      <p class="card-text">{{dataframe.Close.median|floatformat:2}}</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Média</h5>
+      <p class="card-text">{{dataframe.Close.mean|floatformat:2}}</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Desvio Padrão</h5>
+      <p class="card-text">{{dataframe.Close.std|floatformat:2}}</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Ultimo Preço</h5>
+      <p class="card-text">
+        {{infor_ativo.info.regularMarketPrice|floatformat:2}}
+      </p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Tendencia</h5>
+      <p class="card-text">
+        {{tendencia.tendencia}}
+      </p>
+    </div>
+  </div>
+</div>
+<div>
+    {{previsao.to_html|safe}}
+</div>
 {% endblock body %}

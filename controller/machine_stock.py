@@ -1,4 +1,5 @@
 # Importing the necessary libraries for the class to work.
+import matplotlib.pyplot as plt
 import pandas as pd
 import scipy.stats as stats
 from prophet import Prophet
@@ -13,9 +14,8 @@ class Preparacao:
         :type dataframe: pd.DataFrame
         """
         self.modelo_prophet = Prophet()
-        
 
-    def preparando_serie(self,dataframe:pd.DataFrame) -> pd.Series:
+    def preparando_serie(self, dataframe: pd.DataFrame) -> pd.Series:
         """
         It returns a series with the closing price of the stock
         : return: A series with the closing price of the stock.
@@ -43,29 +43,27 @@ class Preparacao:
         """
         return stats.normaltest(serie)
 
-
-    def previsao_prophet(self, dataframe:pd.DataFrame):
+    def previsao_prophet(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         dataframe = self.__serie_to_dataframe_prophet(dataframe)
         modelo_prophet = Prophet()
         modelo_prophet.fit(dataframe)
-        futuro = modelo_prophet.make_future_dataframe(periods=8)
+        futuro = modelo_prophet.make_future_dataframe(periods=5)
         previsores = modelo_prophet.predict(futuro)
-        previsores = previsores[['ds','yhat', 'yhat_lower', 'yhat_upper']]
-        previsores.columns = ['data','fechamento_previsto','minima_previsto','maxima_previsto']
-        return previsores
+        df_previsores = previsores[[
+            'ds', 'yhat', 'yhat_lower', 'yhat_upper', 'trend_lower', 'trend_upper']]
+        df_previsores.columns = ['data', 'fechamento_previsto', 'minima_previsto',
+                                 'maxima_previsto', 'minima_tendencia', 'maxima_tendencia']
+        return df_previsores
 
-    def join_daframe_prev(self,dataframe:pd.DataFrame,previsao:pd.DataFrame) -> pd.DataFrame:
+    def join_daframe_prev(self, dataframe: pd.DataFrame, previsao: pd.DataFrame) -> pd.DataFrame:
         dataframe = dataframe['Close'].to_frame()
         dataframe = dataframe.reset_index()
-        dataframe.columns = ['data','Close']
-        previsao = previsao.merge(dataframe,how='left',on='data')
+        dataframe.columns = ['data', 'Close']
+        previsao = previsao.merge(dataframe, how='left', on='data')
         return previsao
-
 
     def __serie_to_dataframe_prophet(self, dataframe: pd.DataFrame):
         dataframe = dataframe['Close'].to_frame()
         dataframe = dataframe.reset_index()
         dataframe.columns = ['ds', 'y']
         return dataframe
-
- 

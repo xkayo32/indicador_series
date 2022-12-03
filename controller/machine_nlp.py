@@ -10,6 +10,7 @@ from sklearn.metrics import (accuracy_score, classification_report,
                              confusion_matrix)
 from sklearn.model_selection import train_test_split
 from spacy.lang.en import stop_words
+from spacy.training import Example
 
 
 @dataclass
@@ -76,9 +77,10 @@ class PipelinePLN(Base):
         for _ in range(5):
             random.shuffle(base_treinamento_final)
             for batch in spacy.util.minibatch(base_treinamento_final, 512):
-                textos = [modelo(texto) for texto, entities in batch]
+                textos = [modelo.make_doc(texto) for texto, entities in batch]
                 annotations = [{'cats': entities} for texto, entities in batch]
-                modelo.update([textos, annotations])
+                example = Example.from_dict(textos,annotations)
+                modelo.update([example])
         modelo.to_disk('controller/data/modelo')
             
     def __tratamento_classe(self,base_treinamento:pd.DataFrame)-> pd.DataFrame:
