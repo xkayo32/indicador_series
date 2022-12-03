@@ -3,6 +3,7 @@
   padding: 0;
   margin: 0;
 }
+
 .container {
   width: 100vw;
   height: 100vh;
@@ -10,7 +11,7 @@
 }
 
 .img_left {
-  background-image: url("../images_css/imgdedao.png");
+  background-image: url("../img/imgdedao.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -21,30 +22,29 @@
 
 .conteudo_right {
   background: rgb(2, 0, 36);
-  background: linear-gradient(
-    163deg,
-    rgba(2, 0, 36, 1) 0%,
-    rgba(124, 213, 253, 1) 66%,
-    rgba(0, 212, 255, 1) 100%
-  );
+  background: linear-gradient(163deg,
+      rgba(2, 0, 36, 1) 0%,
+      rgba(124, 213, 253, 1) 66%,
+      rgba(0, 212, 255, 1) 100%);
   width: 50%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-/*
+
+
 .box_login {
-    border: 1px solid red;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
+  border: 1px solid red;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 }
-*/
+
 
 .button_login {
   width: 30%;
@@ -69,8 +69,6 @@
   outline: none;
 }
 
-.input:hover {
-}
 
 .input:focus {
   border: 2px solid blueviolet;
