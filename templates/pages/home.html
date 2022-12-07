@@ -1,23 +1,25 @@
 {% extends 'base/base.html' %}
 {% load static %}
 {% block title %}Login{% endblock title %}
+{% block css_add %}
+<link rel="stylesheet" href="{% static 'css/style_home.css' %}">
+{% endblock css_add %}
 {% block body %}
-      <div class="img_left"></div>
-      <div class="conteudo_right">
-        <div class="box_login">
-          <form method="post" action="{% url 'core:ativos_page' %}">
-            {% csrf_token %}
-          <label>E-mail</label><br />
-          <input type="text" placeholder="Username" class="input" />
-          <br />
-          <br />
-
-          <input type="password" placeholder="Password" class="input mb-10" />
-          <br />
-            <button type="submit" class="button_login">Logar</button>
-          <a href="#"> Esqueci minha senha </a>
-          </form>
-        </div>
-      </div>
-
+<section class="area-login">
+  <div class="login">
+    <div>
+      <img src="{% static 'img/logo.png' %}" />
+    </div>
+    <form method="post" action="{% url 'core:ativos_page' %}">
+      {% csrf_token %}
+      <input type="text" class="nome" placeholder="Username" name="username" autofocus />
+      <input type="password" class="senha" name="password" placeholder="Password" />
+      <input type="submit" value="entrar" />
+    </form>
+    <p>Ainda não tem uma conta?<a href="#">Criar conta</a></p>
+    <div class="error">
+      <h3>Usuário ou senha incorreto. Por favor, tente novamente!</h3>
+    </div>
+  </div>
+</section>
 {% endblock body %}

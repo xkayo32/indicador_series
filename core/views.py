@@ -14,7 +14,6 @@ def ativos_page(request):
 
 
 def previsao_page(request):
-
     if request.method == 'POST':
         POST = request.POST
         ativo_controller = AtivoController(
