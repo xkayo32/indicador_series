@@ -1,4 +1,4 @@
-* {
+/* * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -8,7 +8,7 @@
     rgba(9, 9, 121, 1) 21%,
     rgba(0, 212, 255, 1) 100%
   );
-}
+} */
 
 img {
   height: 100vh;

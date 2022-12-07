@@ -1,4 +1,3 @@
-import plotly.graph_objects as go
 from django.shortcuts import redirect, render
 
 from controller.controller import AtivoController
@@ -10,17 +9,20 @@ def home_page(request):
     return render(request, 'pages/home.html')
 
 
+def ativos_page(request):
+    return render(request, 'pages/ativos.html')
+
+
 def previsao_page(request):
+
     if request.method == 'POST':
         POST = request.POST
         ativo_controller = AtivoController(
             POST['acao'], POST['data_inicial'], POST['data_final'])
         dataframe = ativo_controller.base_dados
-        fig2 = go.Figure(data=[go.Candlestick(x=dataframe.index, open=dataframe['Open'],
-                                              high=dataframe['High'], low=dataframe['Low'], close=dataframe['Close'])])
-        previsao = ativo_controller.base_previsao
-        tendencia = ativo_controller.tendencia(previsao)
-        context = {'fig2': fig2, 'dataframe': dataframe,
-                   'infor_ativo': ativo_controller.infor_ativo, 'previsao': previsao, 'tendencia': tendencia}
+        previsao = ativo_controller.base_previsao()
+        tendencia = ativo_controller.tendencia()
+        context = {'grafico_candle': ativo_controller.grafico_candle(), 'grafico_tendencia': ativo_controller.grafico_tendencia(), 'dataframe': dataframe,
+                   'infor_ativo': ativo_controller.infor_ativo, 'previsao': previsao, 'tendencia': tendencia, 'ultima_tendencia': previsao.loc[previsao['data'] == POST['data_final']]}
         return render(request, 'pages/previsao.html', context)
     return redirect('core:home_page')

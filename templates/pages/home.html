@@ -5,6 +5,8 @@
       <div class="img_left"></div>
       <div class="conteudo_right">
         <div class="box_login">
+          <form method="post" action="{% url 'core:ativos_page' %}">
+            {% csrf_token %}
           <label>E-mail</label><br />
           <input type="text" placeholder="Username" class="input" />
           <br />
@@ -12,8 +14,9 @@
 
           <input type="password" placeholder="Password" class="input mb-10" />
           <br />
-          <button class="button_login">LOGIN</button> <br />
+            <button type="submit" class="button_login">Logar</button>
           <a href="#"> Esqueci minha senha </a>
+          </form>
         </div>
       </div>
 

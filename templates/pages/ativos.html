@@ -1,0 +1,34 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}Ativos{% endblock title %}
+{% block body %}
+
+<form action="{% url 'core:previsao_page' %}" method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="ativo">Ativo</label>
+        <select class="form-control" id="ativo" name="acao">
+            <option value="PETR4.SA">PETR4</option>
+            <option value="VALE3.SA">VALE3</option>
+            <option value="ITUB4.SA">ITUB4</option>
+            <option value="BBAS3.SA">BBAS3</option>
+            <option value="ABEV3.SA">ABEV3</option>
+            <option value="BBDC4.SA">BBDC4</option>
+            <option value="BBDC3.SA">BBDC3</option>
+            <option value="EURUSD=X">EURUSD</option>
+            <option value="USDBRL=X">USDBRL</option>
+            
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="data">Data Inicial</label>
+        <input type="date" class="form-control" id="data_inicial" name="data_inicial" required>
+    </div>
+    <div class="form-group">
+        <label for="data">Data Final</label>
+        <input type="date" class="form-control" id="data_final" name="data_final" required>
+    </div>
+    <button type="submit">Prever</button>
+</form>
+
+{% endblock body %}
