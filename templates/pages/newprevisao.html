@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Previsao</title>
+    <link rel="stylesheet" href="../../static/css/style_previsao.css" />
+  </head>
+  <body>
+    <section class="tela-input">
+      <div class="input">
+        <label for="ativo"
+          >Ativo
+          <select class="input-ativo" name="acao">
+            <option value="PETR4.SA">PETR4</option>
+            <option value="VALE3.SA">VALE3</option>
+            <option value="ITUB4.SA">ITUB4</option>
+            <option value="BBAS3.SA">BBAS3</option>
+            <option value="ABEV3.SA">ABEV3</option>
+            <option value="BBDC4.SA">BBDC4</option>
+            <option value="BBDC3.SA">BBDC3</option>
+            <option value="EURUSD=X">EURUSD</option>
+            <option value="USDBRL=X">USDBRL</option>
+          </select>
+        </label>
+        <label
+          >Data Inicial
+          <input type="date" class="data-inicial" />
+        </label>
+
+        <label
+          >Data Final
+          <input type="date" class="data-final" />
+        </label>
+        <input type="submit" class="search" value="Pesquisar" />
+      </div>
+    </section>
+  </body>
+</html>
