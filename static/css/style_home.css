@@ -58,6 +58,14 @@ form [type="submit"] {
   cursor: pointer;
 }
 
+.error {
+  color: red;
+  text-align: center;
+  align-items: center;
+  margin-top: 20px;
+  display: none;
+}
+
 p {
   color: #cbd0f7;
 }
