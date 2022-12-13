@@ -1,0 +1,79 @@
+{% extends 'base/base.html' %} {% block title %}Previsão -
+{{infor_ativo.info.longName}}{% endblock title %} {% block body %}
+<div class="text-center">
+  <h1>{{infor_ativo.info.longName}}</h1>
+</div>
+{{grafico_candle.to_html|safe}}
+{{grafico_tendencia.to_html|safe}}
+{{previsao.tail.to_html|safe}}
+
+<div class="card-group">
+  <h3>Preço de fechamento</h3>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Mediana</h5>
+      <p class="card-text">{{dataframe.Close.median|floatformat:2}}</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Média</h5>
+      <p class="card-text">{{dataframe.Close.mean|floatformat:2}}</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Desvio Padrão</h5>
+      <p class="card-text">{{dataframe.Close.std|floatformat:2}}</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Ultimo Preço</h5>
+      <p class="card-text">
+        {{infor_ativo.info.regularMarketPrice|floatformat:2}}
+      </p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Tendencia</h5>
+      <p class="card-text">{{tendencia.tendencia}}</p>
+    </div>
+  </div>
+</div>
+<div class="card-group">
+  <h3>Valor de tendencia</h3>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Mediana</h5>
+      <p class="card-text">{{previsao.maxima_tendencia.median|floatformat:2}}</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Média</h5>
+      <p class="card-text">{{previsao.maxima_tendencia.mean|floatformat:2}}</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Desvio Padrão</h5>
+      <p class="card-text">{{previsao.maxima_tendencia.std|floatformat:2}}</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Ultima tendecia</h5>
+      <p class="card-text">
+        {{ultima_tendencia.maxima_tendencia|floatformat:2}}
+      </p>
+    </div>
+  </div>
+</div>
+<div>
+  <h3>Fibonacci</h3>
+  <p>
+    {{tendencia.fibonacci}}
+</div>
+{% endblock body %}

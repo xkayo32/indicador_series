@@ -9,11 +9,8 @@ def home_page(request):
     return render(request, 'pages/home.html')
 
 
-def ativos_page(request):
-    return render(request, 'pages/ativos.html')
-
-
 def previsao_page(request):
+
     if request.method == 'POST':
         POST = request.POST
         ativo_controller = AtivoController(
@@ -23,5 +20,7 @@ def previsao_page(request):
         tendencia = ativo_controller.tendencia()
         context = {'grafico_candle': ativo_controller.grafico_candle(), 'grafico_tendencia': ativo_controller.grafico_tendencia(), 'dataframe': dataframe,
                    'infor_ativo': ativo_controller.infor_ativo, 'previsao': previsao, 'tendencia': tendencia, 'ultima_tendencia': previsao.loc[previsao['data'] == POST['data_final']]}
-        return render(request, 'pages/previsao.html', context)
-    return redirect('core:home_page')
+    else:
+        context = {}
+
+    return render(request, 'pages/previsao.html', context)

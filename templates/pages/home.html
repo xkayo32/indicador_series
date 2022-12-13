@@ -10,11 +10,12 @@
     <div>
       <img src="{% static 'img/logo.png' %}" />
     </div>
-    <form method="post" action="{% url 'core:ativos_page' %}">
+    <form method="post" action="">
       {% csrf_token %}
       <input type="text" class="nome" placeholder="Username" name="username" autofocus />
       <input type="password" class="senha" name="password" placeholder="Password" />
-      <input type="submit" value="entrar" />
+      {% comment %} <input type="submit" value="entrar" /> {% endcomment %}
+      <a href="{% url 'core:previsao_page' %}" class="btn btn-primary">Entrar</a>
     </form>
     <p>Ainda não tem uma conta?<a href="#">Criar conta</a></p>
     <div class="error">

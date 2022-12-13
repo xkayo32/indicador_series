@@ -1,42 +1,34 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Previsao</title>
-    <link rel="stylesheet" href="../../static/css/style_previsao.css" />
-  </head>
-  <body>
-    <section class="tela-input">
-      <div class="input">
-        <label for="ativo"
-          >Ativo
-          <select class="input-ativo" name="acao">
-            <option value="PETR4.SA">PETR4</option>
-            <option value="VALE3.SA">VALE3</option>
-            <option value="ITUB4.SA">ITUB4</option>
-            <option value="BBAS3.SA">BBAS3</option>
-            <option value="ABEV3.SA">ABEV3</option>
-            <option value="BBDC4.SA">BBDC4</option>
-            <option value="BBDC3.SA">BBDC3</option>
-            <option value="EURUSD=X">EURUSD</option>
-            <option value="USDBRL=X">USDBRL</option>
-          </select>
+{% extends "base/base.html" %} {% load static %}
+{% block title %}Ativos {%endblock title %}
+{% block css_add %}
+<link rel="stylesheet" href="{% static 'css/style_previsao.css' %}" />{% endblock css_add %}
+{% block body %}
+<section class="tela-input">
+  <form action="{% url 'core:previsao_page' %}" method="post">
+    <div class="input">
+      <label for="ativo">Ativo
+        <select class="input-ativo" name="acao">
+          <option value="PETR4.SA">PETR4</option>
+          <option value="VALE3.SA">VALE3</option>
+          <option value="ITUB4.SA">ITUB4</option>
+          <option value="BBAS3.SA">BBAS3</option>
+          <option value="ABEV3.SA">ABEV3</option>
+          <option value="BBDC4.SA">BBDC4</option>
+          <option value="BBDC3.SA">BBDC3</option>
+          <option value="EURUSD=X">EURUSD</option>
+          <option value="USDBRL=X">USDBRL</option>
+        </select>
+      </label>
+      <div class="date">
+        <label>Data Inicial
+          <input type="date" class="data-inicial" name="data_inicial" required />
         </label>
-        <div class="date">
-        <label
-          >Data Inicial
-          <input type="date" class="data-inicial" />
-        </label>
-
-        <label
-          >Data Final
-          <input type="date" class="data-final" />
+        <label>Data Final
+          <input type="date" class="data-final" name="data_final" required />
         </label>
       </div>
-        <input type="submit" class="search" value="Pesquisar" />
-      </div>
-    </section>
-  </body>
-</html>
+      <input type="submit" class="search" value="Pesquisar" />
+    </div>
+  </form>
+</section>
+{% endblock body %}
